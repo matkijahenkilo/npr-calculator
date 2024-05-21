@@ -11,17 +11,26 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-7KqMG/rNk26R03GVXKLPaTyQUZsmw5UWHK7nUcCLcRo=";
   };
 
+  # About runHooks: https://github.com/jtojnar/nixpkgs-hammering/blob/6a4f88d82ab7d0a95cf21494896bce40f7a4ac22/explanations/missing-phase-hooks.md
   buildPhase = ''
-    c++ -o main main.cpp
+    runHook preBuild
+
+    c++ -o ${pname} main.cpp
+
+    runHook postBuild
   '';
   installPhase = ''
+    runHook preInstall
+
     mkdir -p $out/bin/
-    cp main $out/bin/
+    cp ${pname} $out/bin/
+
+    runHook postInstall
   '';
 
   meta = with lib; {
     description = "Uma calculadora simples de notação polonesa reversa";
-    homepage = "https://github.com/matkijahenkilo/${pname}";
+    homepage = "https://github.com/matkijahenkilo/npr-calculator";
     license = licenses.mit;
     platforms = platforms.unix;
   };
